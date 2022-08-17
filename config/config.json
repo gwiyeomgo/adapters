@@ -1,0 +1,26 @@
+{
+  "Dooray": {
+    "ApiKey": "dooray-api apikey",
+    "Project" : {
+      "Url": "https://api.dooray.com/project/v1/projects",
+      "List":{
+        "ErrorEvent" : {
+          "ProjectNo": "",
+          "ProjectMemberGroupId": ""
+        },
+        "ErrorReport":{
+          "ProjectNo": "",
+          "ProjectMemberGroupId": ""
+        },
+        "ErrorNotFoundEvent": {
+          "ProjectNo": "",
+          "ProjectMemberGroupId": ""
+        },
+        "EtcErrorNotFoundEvent": {
+          "ProjectNo": "",
+          "ProjectMemberGroupId": ""
+        }
+      }
+    }
+  }
+}
