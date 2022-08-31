@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gwiyeomgo/adapters/config"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -151,15 +150,15 @@ func (d DoorayAdapter) SendTask(title string, contents string, projectNo string,
 	}
 	defer resp.Body.Close()
 
-	r, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
+	/*	r, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return err
+		}
 
-	var result = map[string]interface{}{}
-	if err := json.Unmarshal(r, &result); err != nil {
-		return err
-	}
-	fmt.Println(result)
+		var result = map[string]interface{}{}
+		if err := json.Unmarshal(r, &result); err != nil {
+			return err
+		}
+		fmt.Println(result)*/
 	return nil
 }

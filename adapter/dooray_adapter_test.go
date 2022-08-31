@@ -15,7 +15,7 @@ import (
 func TestDooray_SendTask(t *testing.T) {
 	// setUp WebServer Fixture
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost && r.URL.Path == "/project/v1/projects/12/posts" {
+		if r.Method == http.MethodPost && r.URL.Path == "/project/v1/projects/1/posts" {
 			w.WriteHeader(200)
 		} else {
 			w.WriteHeader(400)
@@ -24,11 +24,12 @@ func TestDooray_SendTask(t *testing.T) {
 	defer server.Close()
 
 	// given
-	config.Config.Dooray.Project.List.ErrorEvent.ProjectNo = ""
+	config.Config.Dooray.Project.List.ErrorEvent.ProjectNo = "1"
+	config.Config.Dooray.Project.List.ErrorEvent.ProjectMemberGroupId = "1"
 	config.Config.Dooray.Project.Url = fmt.Sprintf("%v/project/v1/projects", server.URL)
 	config.Config.Dooray.ApiKey = "TEST API Key"
 
-	errorStackTrace := "[ERROR] Key: 'DonationVisitTxCreate.Mobile' Error:Field validation for 'Mobile' failed on the 'required' tag goroutine 113014 [running]: sharing-platform-service/config/handler.CustomHTTPErrorHandler({0xe52cc0, 0xc0008acdc8}, {0xe840b8, 0xc000290d90})  /var/app/staging/config/handler/error_handler.go:77 +0x94"
+	errorStackTrace := "[ERROR] Key: test"
 	token := "Bearer key"
 	content := Content{
 		User{
@@ -42,23 +43,11 @@ func TestDooray_SendTask(t *testing.T) {
 			" application/json",
 			token,
 			`{
-								"takeOverMethodType" : "VISIT",
-								"siteCode" : "200020",
-								"memberId" : 1,
-								"mobile" : "",
-								"name" : "gwiyeomgo",
-								"agreed" : true,
-								"campaignId" : 4,
-								"items" : [
-								{
-								"itemType" : "100",
-								"quantity" : 1
-								}
-								],
-								"note" : ""
+
+								"memberId" : "1",
+							
 							}`,
-			GetHumanizeBrowserUserAgent("Mozilla/5.0 (Linux; U; Android 2.3.7; en-us; Nexus One Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1"),
-		},
+			""},
 		Response{
 			400,
 			`{}`,
