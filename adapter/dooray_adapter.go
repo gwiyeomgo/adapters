@@ -1,8 +1,12 @@
-package adapters
+package adapter
 
 import (
-	"net/http"
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/gwiyeomgo/adapters/config"
+	"io/ioutil"
+	"net/http"
 )
 
 type DoorayAdapter struct {
@@ -10,7 +14,7 @@ type DoorayAdapter struct {
 
 func NewDoorayTask(content Content) (string, string, string, string) {
 
-	title := fmt.Sprintf("%v ...", content.Error.ErrorStackTrace[:40])
+	title := fmt.Sprintf("%v ...", content.Error.ErrorStackTrace)
 	contents := fmt.Sprintf("# 로그인 사용자\n"+
 		"* memberId:<span style=\"color:#9933ff\"> %v</span>\n"+
 		"* Name:<span style=\"color:#9933ff\"> %v</span>\n\n"+
@@ -35,16 +39,13 @@ func NewDoorayTask(content Content) (string, string, string, string) {
 		content.Request.Authorization,
 		content.Request.BrowserUserAgent,
 		content.Request.RequestBody,
-		content.Response.statusCode,
+		content.Response.StatusCode,
 		content.Response.ResponseBody,
 		content.Error.ErrorStackTrace)
 
 	projectNo := config.Config.Dooray.Project.List.ErrorEvent.ProjectNo
 	projectMemberGroupId := config.Config.Dooray.Project.List.ErrorEvent.ProjectMemberGroupId
-	if content.Response.statusCode == http.StatusNotFound {
-		projectNo = config.Config.Dooray.Project.List.ErrorNotFoundEvent.ProjectNo
-		projectMemberGroupId = config.Config.Dooray.Project.List.ErrorNotFoundEvent.ProjectMemberGroupId
-	}
+
 	return title, contents, projectNo, projectMemberGroupId
 }
 
@@ -71,7 +72,7 @@ type Request struct {
 }
 
 type Response struct {
-	statusCode   int64
+	StatusCode   int64
 	ResponseBody string
 }
 
@@ -79,35 +80,86 @@ type Error struct {
 	ErrorStackTrace string
 }
 
-
 func (d DoorayAdapter) SendTask(title string, contents string, projectNo string, projectMemberGroupId string) error {
+
 	doorayUrl := config.Config.Dooray.Project.Url + "/" + projectNo + "/posts"
 	apiKey := config.Config.Dooray.ApiKey
 	requestBody := map[string]interface{}{
 		"users": map[string]interface{}{
-			"cc": []interface{}{
+			"to": []interface{}{
 				map[string]interface{}{
-					"type": "group",
-					"group": map[string]interface{}{
-						"projectMemberGroupId": projectMemberGroupId,
+					"type": "member",
+					"member": map[string]interface{}{
+						"organizationMemberId": projectMemberGroupId,
 					},
 				},
 			},
 		},
-		"subject": title,
+		"subject": "title",
 		"body": map[string]interface{}{
-			"mimeType": "text/x-markdown",
-			"content":  contents,
+			"mimeType": "text/html", //"text/x-markdown",
+			"content":  "contents",
 		},
-		"dueDateFlag": false,
+		"dueDateFlag": true,
 		"priority":    "none",
 	}
+	b, err := json.Marshal(requestBody)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(b))
+	reqBody := bytes.NewBufferString(string(b))
+	/*	reqBody := bytes.NewBufferString(`{
+	    "users": {
+	        "to": [{
+	            "type": "member",
+	            "member": {
+	                "organizationMemberId": "3352267848439658321"
+	            }
+	        }, {
+	            "type": "emailUser",
+	            "emailUser": {
+	                "emailAddress": "",
+	                "name": ""
+	            }
+	        }],
+	        "cc": [{
+	            "type": "member",
+	            "member": {
+	                "organizationMemberId": "3352267848439658321"
+	            }
+	        }]
+	    },
+	    "subject": "장애 대응 테스트 파일",
+	    "body": {
+	        "mimeType": "text/html",
+	        "content": "장애 대응 테스트 입니다."
+	    },
+	    "dueDate": "2022-01-08T18:00:00+09:00",
+	    "dueDateFlag": true,
+	    "milestoneId" :"1",
+	    "tagIds": ["1", "2"],
+	    "priority": "none"
+	}`)*/
+	req, _ := http.NewRequest("POST", doorayUrl, reqBody)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", apiKey)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
 
-	client := rest.Client{}
+	r, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
 
-	return client.
-		Request().
-		SetBody(requestBody).
-		SetHeader("Authorization", apiKey).
-		Post(doorayUrl)
+	var result = map[string]interface{}{}
+	if err := json.Unmarshal(r, &result); err != nil {
+		return err
+	}
+	fmt.Println(result)
+	return nil
 }

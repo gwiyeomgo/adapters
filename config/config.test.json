@@ -1,5 +1,4 @@
 {
-
     "Dooray": {
         "ApiKey": "dooray-api key",
         "Project" : {
@@ -8,18 +7,6 @@
                 "ErrorEvent" : {
                     "ProjectNo": "",
                     "ProjectMemberGroupId": ""
-                },
-                "ErrorReport":{
-                    "ProjectNo": "",
-                    "ProjectMemberGroupId": ""
-                },
-                "ErrorNotFoundEvent": {
-                    "ProjectNo": "",
-                    "ProjectMemberGroupId": ""
-                },
-                "EtcErrorNotFoundEvent": {
-                  "ProjectNo": "",
-                  "ProjectMemberGroupId": ""
                 }
             }
         }

@@ -1,14 +1,15 @@
-package adapters
+package adapter
 
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gwiyeomgo/adapters/config"
 	"github.com/mssola/user_agent"
 	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestDooray_SendTask(t *testing.T) {

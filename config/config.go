@@ -1,5 +1,9 @@
 package config
 
+import (
+	"github.com/jinzhu/configor"
+)
+
 var Config = struct {
 	Dooray struct {
 		ApiKey  string
@@ -10,20 +14,11 @@ var Config = struct {
 					ProjectNo            string
 					ProjectMemberGroupId string
 				}
-				ErrorReport struct {
-					ProjectNo            string
-					ProjectMemberGroupId string
-				}
-				ErrorNotFoundEvent struct {
-					ProjectNo            string
-					ProjectMemberGroupId string
-				}
-				EtcErrorNotFoundEvent struct {
-					ProjectNo            string
-					ProjectMemberGroupId string
-				}
 			}
 		}
 	}
 }{}
 
+func ConfigureEnvironment(path string) {
+	configor.Load(&Config, path+"config/config.json")
+}
