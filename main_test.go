@@ -4,23 +4,28 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gwiyeomgo/adapters/config"
-	"github.com/labstack/echo"
+	"github.com/stretchr/testify/assert"
 	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
-func main() {
-	e := echo.New()
-	config.ConfigureEnvironment("./")
-	e.GET("/", GetDoorayMember)
-	e.POST("/dooray/task", CreateTask)
-	e.Logger.Fatal(e.Start(":1323"))
-}
+func TestCreateTask(t *testing.T) {
+	// setUp WebServer Fixture
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost && r.URL.Path == "/project/v1/projects/1/posts" {
+			w.WriteHeader(200)
+		} else {
+			w.WriteHeader(400)
+		}
+	}))
+	defer server.Close()
 
-func GetDoorayMember(c echo.Context) error {
-	return c.NoContent(http.StatusOK)
-}
-
-func CreateTask(c echo.Context) error {
+	// given
+	config.Config.Dooray.Project.List.ErrorEvent.ProjectNo = "1"
+	config.Config.Dooray.Project.List.ErrorEvent.ProjectMemberGroupId = "1"
+	config.Config.Dooray.Project.Url = fmt.Sprintf("%v/project/v1/projects", server.URL)
+	config.Config.Dooray.ApiKey = "TEST API Key"
 
 	content := map[string]interface{}{}
 	request := map[string]interface{}{}
@@ -38,7 +43,7 @@ func CreateTask(c echo.Context) error {
 
 	bytes, err := json.Marshal(content)
 	if err != nil {
-		return err
+
 	}
 
 	task := Task{}
@@ -52,5 +57,7 @@ func CreateTask(c echo.Context) error {
 	apiKey := config.Config.Dooray.ApiKey
 
 	adapter := DoorayAdapter{task: &task, doorayUrl: doorayUrl, apiKey: apiKey}
-	return adapter.Send()
+	adapter.Send()
+	// then
+	assert.Nil(t, err)
 }

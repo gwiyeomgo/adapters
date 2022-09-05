@@ -3,10 +3,8 @@ module github.com/gwiyeomgo/adapters
 go 1.16
 
 require (
-	github.com/bettercode-oss/rest v0.0.4
-	github.com/jinzhu/configor v1.2.1 // indirect
+	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo v3.3.10+incompatible
-	github.com/labstack/echo/v4 v4.8.0 // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mssola/user_agent v0.5.3
