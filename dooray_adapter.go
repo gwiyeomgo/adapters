@@ -3,7 +3,9 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"reflect"
 )
 
 type Task map[string]string
@@ -30,7 +32,7 @@ func (t Task) New() string {
 		},
 		"subject": "title",
 		"body": map[string]interface{}{
-			"mimeType": "text/x-markdown", //"text/html",
+			"mimeType": t.Get("mimeType"), //"text/html",
 			"content":  t.Get("content"),
 		},
 		"dueDateFlag": true,
@@ -64,4 +66,22 @@ func (d DoorayAdapter) Send() error {
 	defer resp.Body.Close()
 
 	return nil
+}
+
+func ChangeContentType(content map[string]interface{}) string {
+	var str string
+	for key, item := range content {
+		t := reflect.ValueOf(item).Type()
+		if t.Kind() == reflect.Map {
+			var line string
+			myMap := item.(map[string]interface{})
+			for k, i := range myMap {
+				line += fmt.Sprintf("* %s \n```\n %s \n```\n", k, i)
+			}
+			str += line
+		} else if t.Kind() == reflect.String {
+			str += fmt.Sprintf("* %s \n```\n %s \n```\n", key, item)
+		}
+	}
+	return str
 }
