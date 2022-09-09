@@ -1,10 +1,8 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gwiyeomgo/adapters/config"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -41,14 +39,10 @@ func TestCreateTask(t *testing.T) {
 	response["statusCode"] = "int64(500)"
 	content["error"] = fmt.Sprintf("[ERROR] %v \n", "stackTrace")
 
-	bytes, err := json.Marshal(content)
-	if err != nil {
-
-	}
-
 	task := Task{}
 	task.Set("title", "")
-	task.Set("content", string(bytes))
+	task.Set("mineType", "text/x-markdown")
+	task.Set("content", ChangeContentType(content))
 	task.Set("projectNo", config.Config.Dooray.Project.List.ErrorEvent.ProjectNo)
 	task.Set("organizationMemberId", config.Config.Dooray.Project.List.ErrorEvent.ProjectMemberGroupId)
 
@@ -59,5 +53,5 @@ func TestCreateTask(t *testing.T) {
 	adapter := DoorayAdapter{task: &task, doorayUrl: doorayUrl, apiKey: apiKey}
 	adapter.Send()
 	// then
-	assert.Nil(t, err)
+	//	assert.Nil(t, err)
 }

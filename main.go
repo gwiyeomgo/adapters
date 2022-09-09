@@ -21,7 +21,7 @@ func GetDoorayMember(c echo.Context) error {
 }
 
 func CreateTask(c echo.Context) error {
-
+	mineType := "text/x-markdown"
 	content := map[string]interface{}{}
 	request := map[string]interface{}{}
 	request["host"] = ""
@@ -43,6 +43,7 @@ func CreateTask(c echo.Context) error {
 
 	task := Task{}
 	task.Set("title", "")
+	task.Set("mimType", mineType)
 	task.Set("content", string(bytes))
 	task.Set("projectNo", config.Config.Dooray.Project.List.ErrorEvent.ProjectNo)
 	task.Set("organizationMemberId", config.Config.Dooray.Project.List.ErrorEvent.ProjectMemberGroupId)
