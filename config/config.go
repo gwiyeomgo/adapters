@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/jinzhu/configor"
+	"log"
 )
 
 var Config = struct {
@@ -20,5 +21,8 @@ var Config = struct {
 }{}
 
 func ConfigureEnvironment(path string) {
-	configor.Load(&Config, path+"config/config.json")
+	err := configor.Load(&Config, path+"config/config.json")
+	if err != nil {
+		log.Fatalln(err)
+	}
 }

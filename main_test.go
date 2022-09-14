@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gwiyeomgo/adapters/config"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -51,7 +52,10 @@ func TestCreateTask(t *testing.T) {
 	apiKey := config.Config.Dooray.ApiKey
 
 	adapter := DoorayAdapter{task: &task, doorayUrl: doorayUrl, apiKey: apiKey}
-	adapter.Send()
+	err := adapter.Send()
+	if err != nil {
+		log.Fatalln(err)
+	}
 	// then
 	//	assert.Nil(t, err)
 }
