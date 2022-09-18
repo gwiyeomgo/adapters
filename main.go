@@ -3,9 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	adapter "github.com/gwiyeomgo/adapters/adapter"
 	"github.com/gwiyeomgo/adapters/config"
 	"github.com/labstack/echo"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -13,6 +15,7 @@ func main() {
 	config.ConfigureEnvironment("./")
 	e.GET("/", GetDoorayMember)
 	e.POST("/dooray/task", CreateTask)
+	e.POST("/aws/sqs/message", CreateSQSMessage)
 	e.Logger.Fatal(e.Start(":1323"))
 }
 
@@ -41,7 +44,7 @@ func CreateTask(c echo.Context) error {
 		return err
 	}
 
-	task := Task{}
+	task := adapter.Task{}
 	task.Set("title", "")
 	task.Set("mimType", mineType)
 	task.Set("content", string(bytes))
@@ -52,6 +55,26 @@ func CreateTask(c echo.Context) error {
 	doorayUrl := config.Config.Dooray.Project.Url + "/" + projectNo + "/posts"
 	apiKey := config.Config.Dooray.ApiKey
 
-	adapter := DoorayAdapter{task: &task, doorayUrl: doorayUrl, apiKey: apiKey}
+	adapter := adapter.DoorayAdapter{Task: &task, DoorayUrl: doorayUrl, ApiKey: apiKey}
 	return adapter.Send()
+}
+
+func CreateSQSMessage(c echo.Context) error {
+	svc := adapter.NewSQS()
+	result, err := svc.ListQueues(nil)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	var queueURL string
+	for _, t := range result.QueueUrls {
+		queueURL = *t
+	}
+	output, err := adapter.SendMessage(svc, "`{test:2}`", queueURL)
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
+	fmt.Println(output)
+	return nil
 }
