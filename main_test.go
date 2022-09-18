@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/gwiyeomgo/adapters/config"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -26,36 +25,10 @@ func TestCreateTask(t *testing.T) {
 	config.Config.Dooray.Project.Url = fmt.Sprintf("%v/project/v1/projects", server.URL)
 	config.Config.Dooray.ApiKey = "TEST API Key"
 
-	content := map[string]interface{}{}
-	request := map[string]interface{}{}
-	request["host"] = ""
-	request["url"] = ""
-	request["method"] = ""
-	request["contentType"] = ""
-	request["authorization"] = ""
-	request["requestBody"] = ""
-	request["browserUserAgent"] = ""
-	content["request"] = request
-	response := map[string]interface{}{}
-	response["statusCode"] = "int64(500)"
-	content["error"] = fmt.Sprintf("[ERROR] %v \n", "stackTrace")
-
-	task := Task{}
-	task.Set("title", "")
-	task.Set("mineType", "text/x-markdown")
-	task.Set("content", ChangeContentType(content))
-	task.Set("projectNo", config.Config.Dooray.Project.List.ErrorEvent.ProjectNo)
-	task.Set("organizationMemberId", config.Config.Dooray.Project.List.ErrorEvent.ProjectMemberGroupId)
-
-	projectNo := task.Get("projectNo")
-	doorayUrl := config.Config.Dooray.Project.Url + "/" + projectNo + "/posts"
-	apiKey := config.Config.Dooray.ApiKey
-
-	adapter := DoorayAdapter{task: &task, doorayUrl: doorayUrl, apiKey: apiKey}
-	err := adapter.Send()
+	/*err := CreateTask(c)
 	if err != nil {
 		log.Fatalln(err)
-	}
+	}*/
 	// then
 	//	assert.Nil(t, err)
 }

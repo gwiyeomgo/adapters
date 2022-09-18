@@ -1,4 +1,4 @@
-package main
+package adapter
 
 import (
 	"bytes"
@@ -47,17 +47,17 @@ func (t Task) New() string {
 }
 
 type DoorayAdapter struct {
-	task      *Task
-	doorayUrl string
-	apiKey    string
+	Task      *Task
+	DoorayUrl string
+	ApiKey    string
 }
 
 func (d DoorayAdapter) Send() error {
-	reqBody := bytes.NewBufferString(d.task.New())
+	reqBody := bytes.NewBufferString(d.Task.New())
 	//request
-	req, _ := http.NewRequest("POST", d.doorayUrl, reqBody)
+	req, _ := http.NewRequest("POST", d.DoorayUrl, reqBody)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", d.apiKey)
+	req.Header.Set("Authorization", d.ApiKey)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

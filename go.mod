@@ -3,6 +3,7 @@ module github.com/gwiyeomgo/adapters
 go 1.16
 
 require (
+	github.com/aws/aws-sdk-go v1.44.91 // indirect
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.1 // indirect

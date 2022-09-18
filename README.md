@@ -11,4 +11,13 @@
 * 사용자가 config.json 을 입력하면 입력된 내용으로
 * 여기까지 완료되면 module 형식으로 변경예정
 
+1. doorayAPI 
+2. gitLAbAPI
+3. aws SQS
+    * aws 에서 SQS 설정은?
+4. kakaoMessage
+5. github
+6. slack
+
+
 
