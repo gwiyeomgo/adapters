@@ -18,6 +18,9 @@ var Config = struct {
 			}
 		}
 	}
+	Mail struct {
+		Password string
+	}
 }{}
 
 func ConfigureEnvironment(path string) {

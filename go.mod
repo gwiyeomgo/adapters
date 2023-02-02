@@ -3,11 +3,12 @@ module github.com/gwiyeomgo/adapters
 go 1.16
 
 require (
-	github.com/aws/aws-sdk-go v1.44.91 // indirect
+	github.com/aws/aws-sdk-go v1.44.91
 	github.com/jinzhu/configor v1.2.1
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/gommon v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mocktools/go-smtp-mock v1.10.0 // indirect
 	github.com/mssola/user_agent v0.5.3
 	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.0

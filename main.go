@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	adapter "github.com/gwiyeomgo/adapters/adapter"
+	adapter "github.com/gwiyeomgo/adapters/adapters"
 	"github.com/gwiyeomgo/adapters/config"
 	"github.com/labstack/echo"
 	"net/http"
