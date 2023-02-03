@@ -5,15 +5,9 @@ import (
 	"testing"
 )
 
-func mockSend(errToReturn error) (func(string, smtp.Auth, string, []string, []byte) error, *emailRecorder) {
-	r := new(emailRecorder)
-	return func(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
-		*r = emailRecorder{addr, a, from, to, msg}
-		return errToReturn
-	}, r
-}
+// https://tmichel.github.io/2014/10/12/golang-send-test-email/
 
-type emailRecorder struct {
+type message struct {
 	addr string
 	auth smtp.Auth
 	from string
@@ -21,17 +15,24 @@ type emailRecorder struct {
 	msg  []byte
 }
 
-// https://tmichel.github.io/2014/10/12/golang-send-test-email/
+func mockSend(errToReturn error) (func(string, smtp.Auth, string, []string, []byte) error, *message) {
+	r := new(message)
+	return func(addr string, a smtp.Auth, from string, to []string, msg []byte) error {
+		*r = message{addr, a, from, to, msg}
+		return errToReturn
+	}, r
+}
+
 func TestEmail_SendSuccessful(t *testing.T) {
 	f, r := mockSend(nil)
 	sender := &emailSender{send: f}
-	body := "Hello World"
+	body := "Subject: Hello World \r\n TEST 내용"
 	err := sender.Send([]string{"me@example.com"}, []byte(body))
 
 	if err != nil {
 		t.Errorf("unexpected error: %s", err)
 	}
 	if string(r.msg) != body {
-		//t.Errorf("wrong message body.\n\nexpected: %\n got: %s", body, r.msg)
+		t.Errorf("wrong message body.\n\nexpected: %s\n got: %s", body, r.msg)
 	}
 }

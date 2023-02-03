@@ -19,7 +19,11 @@ var Config = struct {
 		}
 	}
 	Mail struct {
-		Password string
+		Password   string
+		ServerHost string
+		ServerPort string
+		Username   string
+		SenderAddr string
 	}
 }{}
 
