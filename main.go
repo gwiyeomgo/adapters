@@ -15,8 +15,15 @@ func main() {
 	config.ConfigureEnvironment("./")
 	e.GET("/", GetDoorayMember)
 	e.POST("/dooray/task", CreateTask)
+	e.POST("/gmail/email", SendGmail)
 	e.POST("/aws/sqs/message", CreateSQSMessage)
 	e.Logger.Fatal(e.Start(":1323"))
+}
+
+func SendGmail(c echo.Context) error {
+	sender := adapter.MailAdapter{}.NewEmailSender()
+	body := "Subject: Hello World \r\n TEST 내용"
+	return sender.Send([]string{"gwiyeomgo@gmail.com"}, []byte(body))
 }
 
 func GetDoorayMember(c echo.Context) error {
