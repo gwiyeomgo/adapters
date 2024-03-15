@@ -25,6 +25,13 @@ var Config = struct {
 		Username   string
 		SenderAddr string
 	}
+	AwsS3 struct {
+		SecretAccessKey string
+		Bucket          string
+		Region          string
+		AccessKeyId     string
+		HttpEndPoint    string
+	}
 }{}
 
 func ConfigureEnvironment(path string) {

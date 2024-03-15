@@ -32,3 +32,19 @@ func TestCreateTask(t *testing.T) {
 	// then
 	//	assert.Nil(t, err)
 }
+
+func TestCreateSQSMessage(t *testing.T) {
+
+}
+
+func TestCreateTask1(t *testing.T) {
+
+}
+
+func TestGetDoorayMember(t *testing.T) {
+
+}
+
+func TestSendGmail(t *testing.T) {
+
+}
