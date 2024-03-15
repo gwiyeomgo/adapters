@@ -10,5 +10,11 @@
                 }
             }
         }
+    },
+    "AwsS3": {
+        "Region": "ap-northeast-2",
+        "Bucket": "test-bucket",
+        "AccessKeyId": "",
+        "HttpEndPoint": ""
     }
 }
