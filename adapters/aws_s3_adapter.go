@@ -12,26 +12,22 @@ import (
 	"mime/multipart"
 	"net/http"
 	"path/filepath"
-	"sync"
 )
 
-var (
-	awsS3AdapterOnce     sync.Once
-	awsS3AdapterInstance *awsS3Adapter
-)
-
-func AwsS3Adapter() *awsS3Adapter {
-	awsS3AdapterOnce.Do(func() {
-		awsS3AdapterInstance = &awsS3Adapter{}
-	})
-
-	return awsS3AdapterInstance
+// S3 클라이언트를 추상화하는 인터페이스
+type AwsS3ClientInterface interface {
+	PutObject(input *s3.PutObjectInput) (*s3.PutObjectOutput, error)
 }
 
-type awsS3Adapter struct {
+type AwsS3Adapter struct {
+	client AwsS3ClientInterface
 }
 
-func (a awsS3Adapter) NewS3() *s3.S3 {
+// NewAwsS3Adapter는 새로운 AwsS3Adapter를 생성
+func NewAwsS3Adapter(client AwsS3ClientInterface) *AwsS3Adapter {
+	return &AwsS3Adapter{client: client}
+}
+func (a AwsS3Adapter) NewS3() *s3.S3 {
 	sess, err := session.NewSession(&aws.Config{
 		Endpoint: aws.String(config.Config.AwsS3.HttpEndPoint),
 		Region:   aws.String(config.Config.AwsS3.Region),
@@ -46,10 +42,7 @@ func (a awsS3Adapter) NewS3() *s3.S3 {
 	cliS3 := s3.New(sess)
 	return cliS3
 }
-
-func (a awsS3Adapter) UploadFile(path string, file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
-	client := a.NewS3()
-
+func (a AwsS3Adapter) UploadFile(path string, file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
 	size := fileHeader.Size
 	buffer := make([]byte, size)
 	file.Read(buffer)
@@ -62,7 +55,7 @@ func (a awsS3Adapter) UploadFile(path string, file multipart.File, fileHeader *m
 
 	uploadFileName := fmt.Sprintf("%v/%v", path, uuid.Must(u2, nil).String()+filepath.Ext(fileHeader.Filename))
 
-	_, err = client.PutObject(&s3.PutObjectInput{
+	_, err = a.client.PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(config.Config.AwsS3.Bucket),
 		Key:                  aws.String(uploadFileName),
 		ACL:                  aws.String("public-read"), // private <- only authorized users
