@@ -137,8 +137,12 @@ func CreateTask(c echo.Context) error {
 }
 
 func CreateSQSMessage(c echo.Context) error {
-	svc := adapter.NewSQS()
-	result, err := svc.ListQueues(nil)
+	a := adapter.AwsSQSAdapter{}
+	sqs := a.NewSQS()
+
+	adapter.NewAwsSQSAdapter(sqs)
+
+	result, err := sqs.ListQueues(nil)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)
@@ -147,9 +151,9 @@ func CreateSQSMessage(c echo.Context) error {
 	for _, t := range result.QueueUrls {
 		queueURL = *t
 	}
-	output, err := adapter.SendMessage(svc, "`{test:2}`", queueURL)
+	output, err := a.SendMessage("`{test:2}`", queueURL)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println(err)
 		os.Exit(1)
 	}
 	fmt.Println(output)
