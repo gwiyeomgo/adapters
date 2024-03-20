@@ -5,9 +5,6 @@ import (
 	"net/smtp"
 )
 
-type MailAdapter struct {
-}
-
 type EmailSender interface {
 	Send(to []string, body []byte) error
 }
@@ -15,8 +12,11 @@ type emailSender struct {
 	send func(string, smtp.Auth, string, []string, []byte) error
 }
 
+type MailAdapter struct {
+}
+
 func (MailAdapter) NewEmailSender() EmailSender {
-	return &emailSender{smtp.SendMail}
+	return &emailSender{send: smtp.SendMail}
 }
 
 func (e *emailSender) Send(to []string, body []byte) error {

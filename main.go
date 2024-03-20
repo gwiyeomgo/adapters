@@ -48,6 +48,9 @@ func CreateS3Uload(ctx echo.Context) error {
 	uploadPath := fmt.Sprintf("%s/%v", path, time.Now().Format(DateLayout8))
 	fileUrls := make([]string, len(files))
 
+	client := adapter.AwsS3Adapter{}.NewS3()
+	a := adapter.NewAwsS3Adapter(client)
+
 	for i, file := range files {
 		if image {
 			if file.Size > maxImageSize {
@@ -68,7 +71,7 @@ func CreateS3Uload(ctx echo.Context) error {
 		}
 		defer src.Close()
 
-		accessUrl, err := adapter.AwsS3Adapter().UploadFile(uploadPath, src, file)
+		accessUrl, err := a.UploadFile(uploadPath, src, file)
 		if err != nil {
 			return err
 		}
