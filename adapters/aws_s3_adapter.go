@@ -31,17 +31,24 @@ func AwsS3Adapter() *awsS3Adapter {
 type awsS3Adapter struct {
 }
 
-func (adapter awsS3Adapter) UploadFile(path string, file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
-	s, err := session.NewSession(&aws.Config{
-		Region: aws.String(config.Config.AwsS3.Region),
+func (a awsS3Adapter) NewS3() *s3.S3 {
+	sess, err := session.NewSession(&aws.Config{
+		Endpoint: aws.String(config.Config.AwsS3.HttpEndPoint),
+		Region:   aws.String(config.Config.AwsS3.Region),
 		Credentials: credentials.NewStaticCredentials(
 			config.Config.AwsS3.AccessKeyId,     // id
 			config.Config.AwsS3.SecretAccessKey, // secret
 			""),                                 // token can be left blank for now
 	})
 	if err != nil {
-		return "", err
+		panic(err)
 	}
+	cliS3 := s3.New(sess)
+	return cliS3
+}
+
+func (a awsS3Adapter) UploadFile(path string, file multipart.File, fileHeader *multipart.FileHeader) (string, error) {
+	client := a.NewS3()
 
 	size := fileHeader.Size
 	buffer := make([]byte, size)
@@ -55,7 +62,7 @@ func (adapter awsS3Adapter) UploadFile(path string, file multipart.File, fileHea
 
 	uploadFileName := fmt.Sprintf("%v/%v", path, uuid.Must(u2, nil).String()+filepath.Ext(fileHeader.Filename))
 
-	_, err = s3.New(s).PutObject(&s3.PutObjectInput{
+	_, err = client.PutObject(&s3.PutObjectInput{
 		Bucket:               aws.String(config.Config.AwsS3.Bucket),
 		Key:                  aws.String(uploadFileName),
 		ACL:                  aws.String("public-read"), // private <- only authorized users
