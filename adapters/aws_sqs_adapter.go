@@ -7,7 +7,20 @@ import (
 	"github.com/aws/aws-sdk-go/service/sqs"
 )
 
-func NewSQS() *sqs.SQS {
+type AwsSQSClientInterface interface {
+	SendMessage(input *sqs.SendMessageInput) (*sqs.SendMessageOutput, error)
+}
+
+type AwsSQSAdapter struct {
+	client AwsSQSClientInterface
+}
+
+func NewAwsSQSAdapter(client AwsSQSClientInterface) *AwsSQSAdapter {
+	return &AwsSQSAdapter{client: client}
+}
+
+// 팩토리 메서드(Factory Method) 패턴
+func (a AwsSQSAdapter) NewSQS() *sqs.SQS {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
@@ -15,7 +28,8 @@ func NewSQS() *sqs.SQS {
 	return cliSQS
 }
 
-func SendMessage(sqsClient *sqs.SQS, msg, queueURL string) (*sqs.SendMessageOutput, error) {
+func (a AwsSQSAdapter) SendMessage(msg, queueURL string) (*sqs.SendMessageOutput, error) {
+
 	sqsMessage := &sqs.SendMessageInput{
 		MessageGroupId:         aws.String("2a"),
 		MessageDeduplicationId: aws.String("2a"),
@@ -23,7 +37,7 @@ func SendMessage(sqsClient *sqs.SQS, msg, queueURL string) (*sqs.SendMessageOutp
 		MessageBody:            aws.String(msg),
 	}
 
-	output, err := sqsClient.SendMessage(sqsMessage)
+	output, err := a.client.SendMessage(sqsMessage)
 	if err != nil {
 		return nil, fmt.Errorf("could not send message to queue %v: %v", queueURL, err)
 	}

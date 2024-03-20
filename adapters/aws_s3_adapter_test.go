@@ -16,12 +16,10 @@ import (
 
 //https://aws.amazon.com/ko/blogs/developer/mocking-out-then-aws-sdk-for-go-for-unit-testing/
 
-// MockS3Client is a mock implementation of the S3 client for testing purposes.
 type MockS3Client struct {
 	mock.Mock
 }
 
-// PutObject mocks the PutObject method of the S3 client.
 func (m *MockS3Client) PutObject(input *s3.PutObjectInput) (*s3.PutObjectOutput, error) {
 	return nil, nil
 }
@@ -34,10 +32,8 @@ func Test_awsS3Adapter_UploadFile_URL_creation(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
 	defer server.Close()
 
-	// Create an instance of the MockS3Client
 	mockS3 := new(MockS3Client)
 	config.Config.AwsS3.HttpEndPoint = server.URL
-	// Create an instance of the AwsS3Adapter and set its S3 client to the mockS3
 	adapter := NewAwsS3Adapter(mockS3)
 
 	// Set up test data
@@ -61,7 +57,6 @@ func Test_awsS3Adapter_UploadFile_URL_creation(t *testing.T) {
 		Size:     fileSize,
 	}
 
-	// Call the method under test
 	accessUrl, err := adapter.UploadFile(path, file, fileHeader)
 	if err != nil {
 		t.Errorf("UploadFile returned an error: %v", err)
